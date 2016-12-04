@@ -110,7 +110,23 @@ def breadthFirstSearch(problem):
     You are not required to implement this, but you may find it useful for Q5.
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    node = problem.getStartState()
+
+    border = util.Queue()
+    border.push(node)
+    visited = util.Queue()
+    paths = {}
+    paths[node] = []
+    while not border.isEmpty():
+        node = border.pop()
+        visited.push(node)
+        if problem.goalTest(node):
+            return paths[node]
+        for action in problem.getActions(node):
+            child = problem.getResult(node, action)
+            if child not in visited.list and child not in border.list:
+                border.push(child)
+                paths[child] = paths[node] + [action]
 
 
 def nullHeuristic(state, problem=None):
@@ -180,11 +196,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     visited[node] = 0
     paths = {}
     paths[node] = []
-    fail = False
-    while not fail:
-        if border.isEmpty():
-            fail = True
-            break
+    while not border.isEmpty():
         node = border.pop()
         if problem.goalTest(node):
             return paths[node]

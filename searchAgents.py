@@ -55,6 +55,7 @@ import util
 import time
 import search
 import warnings
+from util import manhattanDistance
 
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
@@ -396,11 +397,27 @@ def cornersHeuristic(state, problem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
-
     corners = problem.corners  # These are the corner coordinates
     walls = problem.walls  # These are the walls of the maze, as a Grid (game.py)
+    xy = state[0]
+    cornersVisited = state[1]
+    h = 0
+    ret = nearDist(xy, corners, cornersVisited)
+    h += ret[0]
+    ret = nearDist(ret[1], corners, cornersVisited)
+    h += ret[0]
+    return h
 
-    return 0 # Default to trivial solution
+def nearDist(state, corners, cornersVisited):
+    d = 0
+    near_state = ()
+    for c in corners:
+        if c not in cornersVisited and state is not () and c is not state:
+            dist = ((state[0] - c[0])**2 + (state[1] - c[1]) ** 2) ** 0.5
+            if dist < d or d is 0:
+                d = dist
+                near_state = c
+    return [d, near_state]
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -523,7 +540,13 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    foods = foodGrid.asList()
+    h = 0
+    for f in foods:
+        result = mazeDistance(f, position, problem.startingGameState)
+        if result > h:
+            h = result
+    return h
 
 def mazeDistance(point1, point2, gameState):
     """
